@@ -58,7 +58,7 @@ output = pd.DataFrame(data=data, columns=['x', 'y','capacity'])
 
 
 # output.to_csv('costmatrix.xlsx', index=False)
-writer = pd.ExcelWriter('Dataset1.xlsx')
+writer = pd.ExcelWriter('Data/Dataset1.xlsx')
 
 output.to_excel(writer,'Sheet1')
 writer.close()
