@@ -23,9 +23,9 @@ from sklearn.cluster import KMeans
 """
 
 # 分离轻重件，单独生成对应文件并返回LP HP
-def Split_LH(data,weight):
+def Split_LH(depotposition,data,weight):
     LP = [0, 0, 0, 0, 0, 0]
-    HP = [1500, 1000, 0, -1, 0]
+    HP = depotposition
 
     for ele in data:
         if ele[2] <= weight and ele[2] > 0:
@@ -55,7 +55,7 @@ def Split_LH(data,weight):
     return LP, HP
 
 
-# 生成后续算法要用到的代价矩阵
+# 生成后续算法要用到的轻件的代价矩阵
 def Generate_LPCostmatrix(lp):
     Node_num = np.shape(lp)[0]
     LP_costmatrix = np.random.randint(0, 1, (Node_num, Node_num))
@@ -80,30 +80,7 @@ def Generate_LPCostmatrix(lp):
     return LP_costmatrix
 
 
-# 生成原先的HP代价矩阵
-# def Generate_HPCostmatrix_Raw(hp):
-#     Node_num = np.shape(hp)[0]
-#     HP_costmatrix_raw = np.zeros((Node_num, Node_num))
-
-#     def cal_distance(i, j):
-#         xd = hp[i][0]-hp[j][0]
-#         yd = hp[i][1]-hp[j][1]
-#         distance = np.sqrt(np.square(xd)+np.square(yd))
-#         return distance
-
-#     for i in range(0, Node_num):
-#         for j in range(0, Node_num):
-#             HP_costmatrix_raw[i][j] = cal_distance(i, j)
-
-#     output = pd.DataFrame(data=HP_costmatrix_raw)
-#     # output.to_csv('costmatrix.xlsx', index=False)
-#     writer = pd.ExcelWriter('Data/HP_costmatrix_raw.xlsx')
-
-#     output.to_excel(writer, 'Sheet1')
-#     writer.close()
-
-#     return HP_costmatrix_raw
-
+#生成重件代价矩阵
 def Generate_HPCostmatrix(hp):
     Node_num = np.shape(hp)[0]
     HP_costmatrix = np.zeros((Node_num, Node_num))
@@ -127,7 +104,7 @@ def Generate_HPCostmatrix(hp):
 
     return HP_costmatrix
 
-
+#生成轻重件混合代价矩阵
 def Generate_LHCostmatrix(lp, hp):
     # 矩阵行轻列重
     Node_numH = np.shape(hp)[0]
@@ -158,13 +135,14 @@ def Generate_LHCostmatrix(lp, hp):
 def LP_Cluster(lp, lp_c, max_d, max_num, hp):
     INF = 9999
 
-    Node_num = np.shape(lp)[0]
+    # Node_num = np.shape(lp)[0]
 
     def show():
         plt.scatter(lp[:, 0], lp[:, 1], c=lp[:, 4])
         plt.plot(hp[:, 0], hp[:, 1], marker='x', linestyle='', color='red')
         plt.show()
 
+    #判断是否符合聚类要求
     def is_meetreq(class_num):
 
         for i in range(0, class_num):
@@ -200,15 +178,14 @@ def LP_Cluster(lp, lp_c, max_d, max_num, hp):
     show()
     return lp
 
-# 判断重件点在不在类内，创建新的聚类中心
-
-
+# 每个类生成等价重件点
 def Generate_Center(lp, hp, lp_c):
 
     classnum = int(np.max(lp[:, 4])+1)
     hp_raw_lenth = np.shape(hp)[0]
     Classtype = np.zeros((classnum, 3))
 
+    #判断是否在长方形区域内
     def is_inClass(ele1, boundcord):
         if ele1[0] > boundcord[2] and ele1[0] < boundcord[3] \
                 and ele1[1] > boundcord[1] and ele1[1] < boundcord[0]:
@@ -273,8 +250,8 @@ def Generate_Center(lp, hp, lp_c):
             if is_inClass(hp[m], init_cord):
                 hp_inclass_num = hp_inclass_num + 1
                 hp[m][3] = i
-                tempx = hp[m][0]
-                tempy = hp[m][1]
+                # tempx = hp[m][0]
+                # tempy = hp[m][1]
                 tempindex = m
 
         center_index = find_center(contents, contents_len, lp_c)
@@ -306,14 +283,7 @@ def Generate_Center(lp, hp, lp_c):
             Classtype[i][2] = -1
             hp[tempindex][4] = 1
             hp[tempindex][2] = hp[tempindex][2] + class_cost
-            
-        # lp[center_index][3] = 1
-
-        # new_hprow = [lp[center_index][0], lp[center_index]
-        #              [1], cal_classcost(contents, lp), i, 1]
-        # # print 'newHP :', new_hprow
-        # hp = np.row_stack((hp, new_hprow))
-
+           
     
     hp_raw = hp[0:hp_raw_lenth, :]
 
@@ -339,11 +309,11 @@ def Generate_Center(lp, hp, lp_c):
 
     return lp, hp
 
-def Pre_Process(file_position , l_limit , max_d , max_num):   
+def Pre_Process(file_position ,depotposition , l_limit , max_d , max_num):   
     rawData = pd.read_excel(file_position)
     rawData = np.array(rawData)
 
-    LP, HP = Split_LH(rawData,l_limit)
+    LP, HP = Split_LH(depotposition,rawData,l_limit)
 
     LP_cost = Generate_LPCostmatrix(LP)
     # HP_cost_raw = Generate_HPCostmatrix_Raw(HP)
@@ -353,7 +323,7 @@ def Pre_Process(file_position , l_limit , max_d , max_num):
 
     LP = LP_Cluster(LP, LP_cost, max_d, max_num, HP)
 
-    Lp, HP = Generate_Center(LP, HP, LP_cost)
+    LP, HP = Generate_Center(LP, HP, LP_cost)
 
     LH_costmatrix = Generate_LHCostmatrix(LP, HP)
 
