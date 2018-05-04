@@ -5,6 +5,16 @@ import pandas as pd
 from sklearn.cluster import KMeans
 
 """
+Input : Dataset1.xlsx
+Output : 
+    Classtype.csv 类信息[种类 起飞点 着陆点]
+    HP_costmatrix.xlsx
+    HP_raw.xlsx
+    HP.xlsx
+    LP.xlsx
+    LH_costmatrix.xlsx
+    LP_costmatrix.xlsx
+
 >LP_Process
     >Split_LH           : 剥离轻重件 分别生成轻重件数据表
 
