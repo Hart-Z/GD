@@ -270,9 +270,9 @@ def Generate_Center(lp, hp, lp_c):
 
 
         if hp_inclass_num == 0:
-            # Classtype[i][0] = 0
-            # Classtype[i][1] = -1
-            # Classtype[i][2] = -1
+            Classtype[i][0] = 0
+            Classtype[i][1] = -1
+            Classtype[i][2] = -1
 
             lp[center_index][3] = 1
             new_hprow = [lp[center_index][0], lp[center_index]
@@ -281,9 +281,9 @@ def Generate_Center(lp, hp, lp_c):
 
 
         elif hp_inclass_num == 1:
-            # Classtype[i][0] = 1
-            # Classtype[i][1] = -1
-            # Classtype[i][2] = -1
+            Classtype[i][0] = 1
+            Classtype[i][1] = -1
+            Classtype[i][2] = -1
             # hp[tempindex][4] = 1
             # hp[tempindex][2] = hp[tempindex][2] + class_cost
 
@@ -293,9 +293,9 @@ def Generate_Center(lp, hp, lp_c):
             hp = np.row_stack((hp, new_hprow))
             
         else:
-            # Classtype[i][0] = 2
-            # Classtype[i][1] = -1
-            # Classtype[i][2] = -1
+            Classtype[i][0] = 2
+            Classtype[i][1] = -1
+            Classtype[i][2] = -1
             # hp[tempindex][4] = 1
             # hp[tempindex][2] = hp[tempindex][2] + class_cost
             lp[center_index][3] = 1
