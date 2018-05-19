@@ -140,6 +140,31 @@ def Generate_LHCostmatrix(lp, hp):
 
     return LH_costmatrix
 
+def Generate_LHCostmatrix_raw(lp, hp):
+    # 矩阵行轻列重
+    Node_numH = np.shape(hp)[0]
+    Node_numL = np.shape(lp)[0]
+    LH_costmatrix = np.zeros((Node_numL, Node_numH))
+
+    def cal_distance(i, j):
+        xd = lp[i][0]-hp[j][0]
+        yd = lp[i][1]-hp[j][1]
+        distance = np.sqrt(np.square(xd)+np.square(yd))
+        return distance
+
+    for i in range(0, Node_numL):
+        for j in range(0, Node_numH):
+            LH_costmatrix[i][j] = cal_distance(i, j)
+
+    output = pd.DataFrame(data=LH_costmatrix)
+    # output.to_csv('costmatrix.xlsx', index=False)
+    writer = pd.ExcelWriter('Data/LH_costmatrix_raw.xlsx')
+
+    output.to_excel(writer, 'Sheet1')
+    writer.close()
+
+    return LH_costmatrix
+
 
 # 轻件聚类最大直径 max_d 最大点数 max_num
 def LP_Cluster(lp, lp_c, max_d, max_num, hp):
@@ -345,4 +370,6 @@ def Pre_Process(file_position ,depotposition , l_limit , max_d , max_num):
 
     LH_costmatrix = Generate_LHCostmatrix(LP, HP)
 
+    LH_costmatrix_raw = Generate_LHCostmatrix_raw(LP, HP)
+    
     HP_cost = Generate_HPCostmatrix(HP)

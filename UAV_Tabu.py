@@ -193,9 +193,11 @@ def get_neighbours():  # 获取邻域路径(随机交换俩)
 
     # 每个邻域矩阵生成一个随机列进一步提升前期收敛速度
     init_route = Class_L[:]
+    
     np.random.shuffle(init_route)
     while is_inTabulist(init_route):
         np.random.shuffle(init_route)
+
     initcost = cal_routecost(init_route)
     Neighbour_route = [init_route, initcost]
 
@@ -207,6 +209,7 @@ def get_neighbours():  # 获取邻域路径(随机交换俩)
         x2 = exchange_matrix[i][1]
         temp_route = Current_route[:]
         temp_route[x1], temp_route[x2] = temp_route[x2], temp_route[x1]
+
 
         while is_inTabulist(temp_route):
 
@@ -225,9 +228,7 @@ def get_neighbours():  # 获取邻域路径(随机交换俩)
 def is_inTabulist(route):  # 判断路径是否在禁忌表中
     for ele in Tabu_table:
         if ele[0] == route:
-            # print True
             return True
-    # print False
     return False
 
 
@@ -275,3 +276,10 @@ def TS_search(class_l, depot1, depot2, Maxcapacity):
     Best_realroute = generate_realroute(Best_route)
     print "Best:" , Best_cost , Best_realroute
     return Best_realroute
+
+
+# class_l = [15,16,17,18,19,20,21]
+# depot1 = 26
+# depot2 = 30
+# UAV_capacity = 20
+# temp_route = TS_search(class_l, depot1, depot2, UAV_capacity)
