@@ -87,10 +87,11 @@ def Find_inRoutes(routes, hp_index):
     return -1, -1
 
 
-def Find_inHP(classnum, class_h, hp):
-    for ele in class_h:
-        if hp[ele][4] == 1:
-            return ele
+def Find_inHP(classnum , hp):
+    hp_len = np.shape(hp)[0]
+    for i in range(0,hp_len) :
+        if hp[i][4] == 1 and hp[i][3] == classnum:
+            return i
     return -1
 
 
@@ -183,9 +184,9 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
         depot1 = -1
         depot2 = -1
 
-        class_l, class_h = PickP_class(i, lp, hp)
+        class_l, class_h = PickP_class(i, lp, hp_raw)
 
-        hp_index = Find_inHP(i, class_h, hp)  # 当前等价重件点在HP表中的位置
+        hp_index = Find_inHP(i, hp)  # 当前等价重件点在HP表中的位置
 
         print "class:", i, "等价重件点：", hp_index
 
@@ -209,32 +210,32 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
         print "class_h:" , class_h
         print "等价点：" , hp_index
         print "current_index:" , route_index, point_index
-        print front_hp
-        print behind_hp
+        print "front_hp:" , front_hp , "behind_hp :" , behind_hp
         current_pointindexR = point_index
         current_pointindexL = point_index
 
         # 路径慢慢往右挪直到不在类内
-        while hp_isinclass(routes[route_index][current_pointindexR], class_h):
+        while hp_isinclass(routes[route_index][current_pointindexR], class_h) or routes[route_index][current_pointindexR] == hp_index :
             # print "class :", i, "route :", route_index, "current_pointindexR :", routes[route_index][current_pointindexR]
             current_pointindexR = current_pointindexR + 1
             # print "class:",i,"route:" , route_index , "current_pointindexR" , routes[route_index][current_pointindexR]
         current_pointindexR = current_pointindexR - 1
 
         # 路径慢慢往左挪直到不在类内
-        while hp_isinclass(routes[route_index][current_pointindexL], class_h):
+        while hp_isinclass(routes[route_index][current_pointindexL], class_h) or routes[route_index][current_pointindexL] == hp_index :
             # print "class :", i, "route :", route_index, "current_pointindexL :", routes[route_index][current_pointindexL]
             current_pointindexL = current_pointindexL - 1
             # print "class:",i,"route:" , route_index , "current_pointindexL" , routes[route_index][current_pointindexL]
         current_pointindexL = current_pointindexL + 1
         
         #最左边的L 最右边的R
-        # print "L:", routes[route_index][current_pointindexL], "R:", routes[route_index][current_pointindexR]
+        print "L:", routes[route_index][current_pointindexL], "R:", routes[route_index][current_pointindexR]
      
 
         Flag_L = hp_isinclass(front_hp , class_h)
 
         Flag_R = hp_isinclass(behind_hp , class_h)
+        print "F_L :", Flag_L , "F_R : " ,Flag_R
 
         #第一种情况 ， 两头都有类内重件点
 
@@ -244,6 +245,7 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
 
             if lp_classlen <= drone_num :
                 Type = "20"
+                print "Type:" , Type
                 """
                 两头重件点确定，中间轻件点点少直飞
                 """
@@ -261,6 +263,7 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
 
             else :
                 Type = "21"
+                print "Type:" , Type
                 """
                 两头重件点确定，中间轻件点点多 CVRP
                 """
@@ -291,6 +294,7 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
         elif Flag_L or Flag_R == False :
             if lp_classlen <= drone_num + 1 :
                 Type = "00"
+                print "Type:" , Type
                 depot1 = hp_index
                 """
                 两头都没重件点,点少，到等价重件点后直接单项环路配送
@@ -334,6 +338,7 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
                 """
 
                 depot1 , depot2 = cal_ugvrouteinclass(front_hp , behind_hp , class_l)
+                print "depot1:" , depot1 , "depot2" , depot2
                 # for m in range(0, lp_classlen):
                 #     for n in range(0, lp_classlen):
                 #         if m != n:
@@ -378,10 +383,11 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
                 depot1 = current_hpindex
                 depot2 = current_hpindex + 1
                 # print "class:",i,"route:" , route_index , "depot1" , routes[route_index][current_pointindexR]
-                print "L:", depot1, "R:" ,depot2
+                print "D1:", depot1, "D2:" ,depot2
 
                 if lp_classlen <= drone_num :
                     Type = "010"
+                    print "Type:" , Type
                     """
                     两头选好等价重件点，但是剩下点少
                     """
@@ -396,6 +402,8 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
                     """
                     否则进行CVRP
                     """
+                    Type = "011"
+                    print "Type:" , Type
                     updateLH_costmatrix(lp,hp_new)
                     # class_l = class_l.tolist()
                     temp_route = TS_search(class_l, depot1, depot2, UAV_capacity)
@@ -422,7 +430,7 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
                 current_hpindex = np.shape(hp_new)[0]
                 new_hprow = hp[depot2][:]
                 hp_new = np.row_stack((hp_new, new_hprow))
-
+                depot2 = current_hpindex
                 #路径上的等价重件点更新为hp_new中的索引
                 del(routes[route_index][point_index])
                 routes[route_index].insert(
@@ -436,7 +444,8 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
                 current_hpindex = np.shape(hp_new)[0]
                 new_hprow = hp[depot1][:]
                 hp_new = np.row_stack((hp_new, new_hprow))
-
+                depot1 = current_hpindex
+                
                 #路径上的等价重件点更新为hp_new中的索引
                 del(routes[route_index][point_index])
                 routes[route_index].insert(
@@ -444,6 +453,7 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
 
             if lp_classlen <= drone_num : 
                 Type = "10"
+                print "Type:" , Type
                 #计算该类的UAV路径
                 temp_route = [0]
                 for ele in class_l :
@@ -453,6 +463,7 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
 
             else : 
                 Type = "11"
+                print "Type:" , Type
                 """
                 两头重件点确定，中间轻件点点多 CVRP
                 """
@@ -469,13 +480,23 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
         updateLH_costmatrix(lp,hp_new)
 
     routes_num = len(routes)
+    hp_len = np.shape(hp)[0]
+    # routes_len = np.shape(routes)[0]
+
+    for i in range(0,routes_num) :
+        line = routes[i]
+        line_len = np.shape(line)[0]
+
+        for j in range(0,line_len) :
+            if routes[i][j] > hp_len :
+                routes[i][j] -= 100
 
     with file("Data/New_routes.csv", "w") as csvfile:
         writer = csv.writer(csvfile)
         for i in range(0, routes_num):
             # route_list = np.array(route_list)
             writer.writerow(routes[i])
-   
+    
     del(uav_routes[0])
     uav_routes_num = len(uav_routes)
 
@@ -486,337 +507,27 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
             # route_list = np.array(route_list)
             writer.writerow(uav_routes[i])
 
-
-# # 为每个类内重新选择两个等价重件点使代价最小，另外更新路径
-# def Choose_depot(classtype, routes, lp, hp, hp_raw, lh_costmatrix, lp_costmatrix, hp_costmatrix):
-
-#     class_num = np.shape(classtype)[0]
-
-#     def updateLH_costmatrix(lp, hp):
-#         # 矩阵行轻列重
-#         Node_numH = np.shape(hp)[0]
-#         Node_numL = np.shape(lp)[0]
-#         LH_costmatrix = np.zeros((Node_numL, Node_numH))
-
-#         def cal_distance(i, j):
-#             xd = lp[i][0]-hp[j][0]
-#             yd = lp[i][1]-hp[j][1]
-#             distance = np.sqrt(np.square(xd)+np.square(yd))
-#             return distance
-
-#         for i in range(0, Node_numL):
-#             for j in range(0, Node_numH):
-#                 LH_costmatrix[i][j] = cal_distance(i, j)
-
-#         output = pd.DataFrame(data=LH_costmatrix)
-#         # output.to_csv('costmatrix.xlsx', index=False)
-#         writer = pd.ExcelWriter('Data/LH_costmatrix.xlsx')
-
-#         output.to_excel(writer, 'Sheet1')
-#         writer.close()
-
-#     for i in range(0, class_num):
-
-#         class_l, class_h = PickP_class(i, lp, hp)
-
-#         hp_index = Find_inHP(i, class_h, hp)  # 当前等价重件点在HP表中的位置
-
-#         print "class:", i, "等价重件点：", hp_index
-
-#         route_index, point_index = Find_inRoutes(routes, hp_index)
-
-#         lp_classlen = len(class_l)
-
-#         # 路径上前一个重件索引
-#         front_hp = routes[route_index][point_index-1]
-#         # 路径上后一个重件索引
-#         behind_hp = routes[route_index][point_index+1]
-
-#         # 无重件点：选出两等价重件点使无人车在新的路径代价最短
-#         if classtype[i][0] == 0:
-#             mincost = 99999999
-#             depot1 = -1
-#             depot2 = -1
-
-#             # 如果类内只有一个轻件点，直接让前后重件点作为起飞停泊点
-#             if lp_classlen == 1:
-#                 del(routes[route_index][point_index])
-#                 print class_l[0]
-#                 print front_hp
-#                 print behind_hp
-#                 classtype[i][1] = front_hp
-#                 classtype[i][2] = behind_hp
-#                 # 加入新的等价重件点到hp_raw
-#                 # new_hprow = [lp[depot1][0], lp[depot1][1], lp[depot1][2], i, 1]
-#                 # hp_raw = np.row_stack((hp_raw, new_hprow))
-#                 # class_l = np.delete(class_l,)
-#                 # routes[route_index][point_index] = current_hpindex
-
-#             else:
-#                 # 遍历类内所有轻件点，找出阶段代价最小的的两个点设置成等价重件点
-#                 for m in range(0, lp_classlen):
-#                     for n in range(0, lp_classlen):
-#                         if m != n:
-#                             lp1_index = class_l[m]
-#                             lp2_index = class_l[n]
-#                             tempcost = lh_costmatrix[lp1_index][front_hp] + \
-#                                 lp_costmatrix[lp1_index][lp2_index] + \
-#                                 lh_costmatrix[lp2_index][behind_hp]
-
-#                             if tempcost < mincost:
-#                                 mincost = tempcost
-#                                 depot1 = lp1_index
-#                                 depot2 = lp2_index
-
-#                 # print "depot1", depot1, "depot2", depot2, "mincost", mincost
-#                 current_hpindex = np.shape(hp_raw)[0]
-
-#                 lp[depot1][3] = 1
-#                 lp[depot2][3] = 1
-#                 class_l = np.delete(class_l, np.where(class_l[:] == depot1), 0)
-#                 class_l = np.delete(class_l, np.where(class_l[:] == depot2), 0)
-#                 # 加入新的等价重件点到hp_raw
-#                 new_hprow1 = [lp[depot1][0], lp[depot1]
-#                               [1], lp[depot1][2], i, 1]
-#                 hp_raw = np.row_stack((hp_raw, new_hprow1))
-#                 new_hprow2 = [lp[depot2][0], lp[depot2]
-#                               [1], lp[depot2][2], i, 1]
-#                 hp_raw = np.row_stack((hp_raw, new_hprow2))
-
-#                 # 改变存储的Routes
-#                 del(routes[route_index][point_index])
-#                 routes[route_index].insert(
-#                     point_index, current_hpindex + 1)  # routes加入n
-#                 routes[route_index].insert(
-#                     point_index, current_hpindex)  # routes加入m
-
-#                 # 改变Classtype里存储的depot
-#                 classtype[i][1] = current_hpindex
-#                 classtype[i][2] = current_hpindex + 1
-
-#                 # depot1 = int(classtype[i][1])
-#                 # depot2 = int(classtype[i][2])
-#                 # TS_search(class_l,depot1,depot2,100,2,2,30)
-#             # print "class:",i,"route:" , route_index , "depot1" , routes[route_index][current_pointindexR]
-#             print "L:", classtype[i][1], "R:" ,classtype[i][2]
-
-#         # 一个重件点，再找出一个轻件点设置成等价重件点使阶段路径代价最小
-#         elif classtype[i][0] == 1:
-#             mincost = 9999999
-#             depot = -1
-#             hp_inclass = class_h[0]
-
-#             for m in range(0, lp_classlen):
-#                 lp_index = class_l[m]
-#                 tempcost1 = lh_costmatrix[lp_index][front_hp] +\
-#                     lh_costmatrix[lp_index][hp_inclass] + \
-#                     hp_costmatrix[hp_inclass][behind_hp]
-#                 tempcost2 = hp_costmatrix[front_hp][hp_inclass] + \
-#                     lh_costmatrix[lp_index][hp_inclass] + \
-#                     lh_costmatrix[lp_index][behind_hp]
-#                 flag = -1  # 0 为轻在前 ，1 为轻在后
-
-#                 if tempcost1 > tempcost2:
-#                     if tempcost2 < mincost:
-#                         mincost = tempcost2
-#                         # depot1 = hp_inclass
-#                         depot = lp_index
-#                         flag = 1
-
-#                 else:
-#                     if tempcost1 < mincost:
-#                         mincost = tempcost1
-#                         depot = lp_index
-#                         # depot2 = hp_inclass
-#                         flag = 0
-
-#             current_hpindex = np.shape(hp_raw)[0]
-
-#             lp[depot][3] = 1
-#             class_l = np.delete(class_l, np.where(class_l[:] == depot), 0)
-
-#             # 将新生成的重件点加入hp_raw
-#             new_hprow = [lp[depot][0], lp[depot][1], lp[depot][2], i, 1]
-#             hp_raw = np.row_stack((hp_raw, new_hprow))
-
-#             # 更新路径表
-
-#             # del(routes[route_index][point_index])
-
-#             """
-#             这里需要加上搜索那一个重件点然后再判断往前加还是往后加
-#             问题：该重件点可能不在类内路径上
-#                 解决方案：
-#                     1、照常规划
-#                         >如果在路径上--照常
-#                         >如果不在，加入当前等价点所在路径，删掉原重件点
-#                     2、开始阶段就将重件点归为一类（采用）
-                        
-            
-#             """
-#             if flag == 0:
-#                 routes[route_index].insert(
-#                     point_index, current_hpindex)  # 等价重件点前加入选出的轻件点
-
-#                 classtype[i][1] = current_hpindex
-#                 classtype[i][2] = hp_inclass
-
-#             else:
-#                 routes[route_index].insert(
-#                     point_index+1, current_hpindex)  # 等价重件点后加入选出的轻件点
-
-#                 classtype[i][1] = hp_inclass
-#                 classtype[i][2] = current_hpindex
-#             # routes[route_index].insert(point_index,current_hpindex + 1) #routes加入n
-#             # routes[route_index].insert(point_index,current_hpindex) #routes加入m
-
-#             # depot1 = int(classtype[i][1])
-#             # depot2 = int(classtype[i][2])
-
-#         else:
-
-#             # classtype(0)==2 大于两个点的情况
-#             #     如果除了当前的标记重件点另外的点不在路径上执行上面的单点情况
-#             #     如果有在路径上的就直接取重件点首末作为无人机中转站
-
-#             # current_routeindex = route_index
-#             current_pointindexR = point_index
-#             current_pointindexL = point_index
-
-#             # 路径慢慢往右挪直到不在类内
-#             while hp_isinclass(routes[route_index][current_pointindexR], class_h):
-#                 print "class:", i, "route:", route_index, "current_pointindexR", routes[route_index][current_pointindexR]
-#                 current_pointindexR = current_pointindexR + 1
-#                 # print "class:",i,"route:" , route_index , "current_pointindexR" , routes[route_index][current_pointindexR]
-#             current_pointindexR = current_pointindexR - 1
-
-#             # 路径慢慢往左挪直到不在类内
-#             while hp_isinclass(routes[route_index][current_pointindexL], class_h):
-#                 print "class:", i, "route:", route_index, "current_pointindexL", routes[route_index][current_pointindexL]
-#                 current_pointindexL = current_pointindexL - 1
-#                 # print "class:",i,"route:" , route_index , "current_pointindexL" , routes[route_index][current_pointindexL]
-#             current_pointindexL = current_pointindexL + 1
-
-#             print "L:", routes[route_index][current_pointindexL], "R:", routes[route_index][current_pointindexR]
-#             if current_pointindexL == point_index and current_pointindexR == point_index:
-#                 # print "惨了，不是同一条路径"
-#                 """
-#                 重复上面的单重件部分
-#                 """
-#                 mincost = 9999999
-#                 depot = -1
-#                 hp_inclass = hp_index
-
-#                 for m in range(0, lp_classlen):
-#                     lp_index = class_l[m]
-#                     tempcost1 = lh_costmatrix[lp_index][front_hp] +\
-#                         lh_costmatrix[lp_index][hp_inclass] + \
-#                         hp_costmatrix[hp_inclass][behind_hp]
-#                     tempcost2 = hp_costmatrix[front_hp][hp_inclass] + \
-#                         lh_costmatrix[lp_index][hp_inclass] + \
-#                         lh_costmatrix[lp_index][behind_hp]
-#                     flag = -1  # 0 为轻在前 ，1 为轻在后
-
-#                     if tempcost1 > tempcost2:
-#                         if tempcost2 < mincost:
-#                             mincost = tempcost2
-#                             # depot1 = hp_inclass
-#                             depot = lp_index
-#                             flag = 1
-
-#                     else:
-#                         if tempcost1 < mincost:
-#                             mincost = tempcost1
-#                             depot = lp_index
-#                             # depot2 = hp_inclass
-#                             flag = 0
-
-#                 lp[depot][3] = 1
-#                 class_l = np.delete(class_l, np.where(class_l[:] == depot), 0)
-
-#                 current_hpindex = np.shape(hp_raw)[0]
-#                 # 将新生成的重件点加入hp_raw
-#                 new_hprow = [lp[depot][0], lp[depot][1], lp[depot][2], i, 1]
-#                 hp_raw = np.row_stack((hp_raw, new_hprow))
-
-#                 # 更新路径表
-
-#                 # del(routes[route_index][point_index])
-
-#                 """
-#                 这里需要加上搜索那一个重件点然后再判断往前加还是往后加
-#                 问题：该重件点可能不在类内路径上
-#                     解决方案：
-#                         1、照常规划
-#                             >如果在路径上--照常
-#                             >如果不在，加入当前等价点所在路径，删掉原重件点
-#                         2、开始阶段就将重件点归为一类（采用）
-                            
-                
-#                 """
-#                 if flag == 0:
-#                     routes[route_index].insert(
-#                         point_index, current_hpindex)  # 等价重件点前加入选出的轻件点
-
-#                     classtype[i][1] = current_hpindex
-#                     classtype[i][2] = hp_inclass
-
-#                 else:
-#                     routes[route_index].insert(
-#                         point_index+1, current_hpindex)  # 等价重件点后加入选出的轻件点
-
-#                     classtype[i][1] = hp_inclass
-#                     classtype[i][2] = current_hpindex
-
-#             else:
-#                 classtype[i][1] = routes[route_index][current_pointindexL]
-#                 classtype[i][2] = routes[route_index][current_pointindexR]
-
-#             # depot1 = int(classtype[i][1])
-#             # depot2 = int(classtype[i][2])
-#             # TS_search(class_l,depot1,depot2,100,2,2,30)
-
-#     Generate_newHPCostmatrix(hp_raw)
-
-#     output1 = pd.DataFrame(
-#         data=hp_raw, columns=['x', 'y', 'capacity', 'class', 'type'])
-#     output2 = pd.DataFrame(data=classtype, columns=[
-#                            'type', 'depot1', 'depot2'])
-#     # output3 = pd.DataFrame(data=routes)
-#     output3 = pd.DataFrame(
-#         data=lp, columns=['x', 'y', 'capacity', 'type', 'class', 'A_num'])
-#     writer1 = pd.ExcelWriter('Data/HP_raw.xlsx')
-#     writer2 = pd.ExcelWriter('Data/LP.xlsx')
-#     # writer4 = pd.ExcelWriter('Data/HP_raw.xlsx')
-#     output1.to_excel(writer1, 'Sheet1')
-#     # output2.to_excel(writer2, 'Sheet1')
-#     # output4.to_excel(writer4, 'Sheet1')
-#     output2.to_csv('Data/Classtype.csv', index=False)
-#     output3.to_excel(writer2, 'Sheet1')
-#     # output3.to_csv('Data/New_routes.csv', index=False)
-#     writer1.close()
-#     writer2.close()
-#     # writer2.close()
-#     # writer4.close()
-#     routes_num = len(routes)
-
-#     with file("Data/New_routes.csv", "w") as csvfile:
-#         writer = csv.writer(csvfile)
-
-#         for i in range(0, routes_num):
-#             # route_list = np.array(route_list)
-#             writer.writerow(routes[i])
-
-#     updateLH_costmatrix(lp, hp_raw)
-#     print routes
-#     print classtype
-
-
-    # 有一个：选出一个等价重件点，使...最短
-
-    # 有多个：如果存在连续的话选连续线段首末点作为停泊点，如果没连续的就选代价最短的回到一个点的问题解决
-
-# def UAV_route_plan():
+    output1 = pd.DataFrame(
+    data=hp_new, columns=['x', 'y', 'capacity', 'class', 'type'])
+    output2 = pd.DataFrame(data=classtype, columns=[
+                           'type', 'depot1', 'depot2'])
+    # output3 = pd.DataFrame(data=routes)
+    output3 = pd.DataFrame(
+        data=lp, columns=['x', 'y', 'capacity', 'type', 'class', 'A_num'])
+    writer1 = pd.ExcelWriter('Data/HP_new.xlsx')
+    writer2 = pd.ExcelWriter('Data/LP.xlsx')
+    # writer4 = pd.ExcelWriter('Data/HP_raw.xlsx')
+    output1.to_excel(writer1, 'Sheet1')
+    # output2.to_excel(writer2, 'Sheet1')
+    # output4.to_excel(writer4, 'Sheet1')
+    output2.to_csv('Data/Classtype.csv', index=False)
+    output3.to_excel(writer2, 'Sheet1')
+    # output3.to_csv('Data/New_routes.csv', index=False)
+    writer1.close()
+    writer2.close()
+
+
+   
 def Generate_newHPCostmatrix(hp):
     Node_num = np.shape(hp)[0]
     HPnew_costmatrix = np.random.randint(0, 1, (Node_num, Node_num))
