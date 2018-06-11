@@ -64,7 +64,6 @@ def Split_LH(depotposition,data,weight):
 
     return LP, HP
 
-
 # 生成后续算法要用到的轻件的代价矩阵
 def Generate_LPCostmatrix(lp):
     Node_num = np.shape(lp)[0]
@@ -334,7 +333,7 @@ def Generate_Center(lp, hp, lp_c):
         data=lp, columns=['x', 'y', 'capacity', 'type', 'class', 'A_num'])
     output2 = pd.DataFrame(
         data=hp, columns=['x', 'y', 'capacity', 'class', 'type'])
-    # output3 = pd.DataFrame(data=Classtype, columns=['type', 'depot1','depot2'])
+    output3 = pd.DataFrame(data=Classtype, columns=['type', 'depot1','depot2'])
     output4 = pd.DataFrame(data=hp_raw, columns=[
                            'x', 'y', 'capacity', 'class', 'type'])
     writer1 = pd.ExcelWriter('Data/LP.xlsx')
@@ -343,7 +342,7 @@ def Generate_Center(lp, hp, lp_c):
     output1.to_excel(writer1, 'Sheet1')
     output2.to_excel(writer2, 'Sheet1')
     output4.to_excel(writer4, 'Sheet1')
-    # output3.to_csv('Data/Classtype.csv', index=False)
+    output3.to_csv('Data/Classtype.csv', index=False)
     writer1.close()
     writer2.close()
     writer4.close()

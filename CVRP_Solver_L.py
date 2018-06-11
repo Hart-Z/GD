@@ -293,7 +293,7 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
         #第二种情况 ， 两头都没有重件
         elif Flag_L or Flag_R == False :
             if lp_classlen <= drone_num + 1 :
-                Type = "00"
+                Type = "30"
                 print "Type:" , Type
                 depot1 = hp_index
                 """
@@ -386,7 +386,7 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
                 print "D1:", depot1, "D2:" ,depot2
 
                 if lp_classlen <= drone_num :
-                    Type = "010"
+                    Type = "310"
                     print "Type:" , Type
                     """
                     两头选好等价重件点，但是剩下点少
@@ -402,7 +402,7 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
                     """
                     否则进行CVRP
                     """
-                    Type = "011"
+                    Type = "311"
                     print "Type:" , Type
                     updateLH_costmatrix(lp,hp_new)
                     # class_l = class_l.tolist()
@@ -559,5 +559,3 @@ def Solver_L(Drone_num , UAV_capacity):
     # Class_L , Class_H = PickP_class(i,LP,HP)
     CVRP_L(Drone_num, UAV_capacity ,Classtype, Routes, LP, HP, HP_raw,
                 LH_Costmatrix , LP_Costmatrix, HP_Costmatrix)
-
-Solver_L(3 , 20)

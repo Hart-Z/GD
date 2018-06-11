@@ -8,7 +8,6 @@ Input:
 Output:
     Routes
 
-
 '''
 
 import numpy as np
@@ -90,7 +89,7 @@ def init(class_l, depot1, depot2 , Maxcapacity):  # 初始化
 
     Neighbour_num = int(np.sqrt(comb(Node_num,2)))+1
     Table_length = int(np.sqrt(Node_num))+1
-    Max_iternum = Node_num*100
+    Max_iternum = Node_num*200
 
     Depot1 = depot1
     Depot2 = depot2
