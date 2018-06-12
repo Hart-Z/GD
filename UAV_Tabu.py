@@ -254,6 +254,7 @@ def TS_search(class_l, depot1, depot2, Maxcapacity):
     global Best_cost
     global Best_route
     
+    print class_l
     init(class_l, depot1, depot2 , Maxcapacity)
 
     current_iternum = 0

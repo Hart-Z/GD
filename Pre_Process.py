@@ -34,7 +34,7 @@ Output :
 
 # 分离轻重件，单独生成对应文件并返回LP HP
 def Split_LH(depotposition,data,weight):
-    LP = [0, 0, 0, 0, 0, 0]
+    LP = [0, 0, 0, 0, -1, 0]
     HP = depotposition
 
     for ele in data:
@@ -45,7 +45,7 @@ def Split_LH(depotposition,data,weight):
             new_HProw = np.append(ele, [-1, 0])
             HP = np.row_stack((HP, new_HProw))
 
-    LP = np.delete(LP, 0, 0)
+    # LP = np.delete(LP, 0, 0)
     # HP = np.delete(HP, 0, 0)
 
     output1 = pd.DataFrame(
@@ -256,6 +256,7 @@ def Generate_Center(lp, hp, lp_c):
         # 循环所有class
         contents = np.where(lp[:, 4] == i)[0]
         contents_len = len(contents)
+        print "Classnum:" , i
         init_index = contents[0]
 
         # top bottom left right

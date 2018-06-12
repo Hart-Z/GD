@@ -295,7 +295,7 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
             if lp_classlen <= drone_num + 1 :
                 Type = "30"
                 print "Type:" , Type
-                depot1 = hp_index
+
                 """
                 两头都没重件点,点少，到等价重件点后直接单项环路配送
                 """ 
@@ -318,7 +318,9 @@ def CVRP_L(drone_num,UAV_capacity,classtype, routes, lp, hp, hp_raw, lh_costmatr
                 new_hprow = hp[hp_index][:]
                 hp_new = np.row_stack((hp_new, new_hprow))
                 updateLH_costmatrix(lp,hp_new)
-
+                
+                depot1 = current_hpindex
+                depot2 = current_hpindex
 
                 #更新路径中的重件点为hp_new中的索引
                 del(routes[route_index][point_index]) #删除等价重件点
