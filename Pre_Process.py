@@ -172,7 +172,7 @@ def LP_Cluster(lp, lp_c, max_d, max_num, hp):
     # Node_num = np.shape(lp)[0]
 
     def show():
-        plt.scatter(lp[:, 0], lp[:, 1], c=lp[:, 4])
+        plt.scatter(lp[1:, 0], lp[1:, 1], c=lp[1:, 4])
         plt.plot(hp[:, 0], hp[:, 1], marker='x', linestyle='', color='red')
         plt.show()
 

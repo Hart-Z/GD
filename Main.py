@@ -18,7 +18,7 @@ Solver_G( 总迭代次数 , 载重量, 初始解个数 , 初始解迭代次数 )
 """
 
 from CVRP_Solver_G import Solver_G
-Solver_G(10000, 500, 10, 800)
+Solver_G(8000, 500, 8, 800)
 
 
 """

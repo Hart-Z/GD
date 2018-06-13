@@ -214,3 +214,5 @@ UGVcost = cal_UGVcost()
 UAVcost = cal_UAVcost()
 
 Total_Timecost = cal_Timecost(1,3)
+
+print  "Total cost : ",UGVcost+UAVcost/5

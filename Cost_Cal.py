@@ -213,4 +213,6 @@ UGV_routelen = np.zeros(classnum)
 UGVcost = cal_UGVcost()
 UAVcost = cal_UAVcost()
 
-Total_Timecost = cal_Timecost(1,3)
+Total_Timecost = cal_Timecost(1,10)
+
+print  "Total cost : ",UGVcost+UAVcost/5
