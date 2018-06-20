@@ -3,7 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import csv
-
+"""
+显示无人机路径
+"""
 def show_route():
     with open("Data/UAV_Routes.csv", "r") as csvfile:
         reader = csv.reader(csvfile)

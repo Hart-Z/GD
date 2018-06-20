@@ -6,7 +6,13 @@ import pandas as pd
 import time
 import csv
 
+'''
+计算各代价
 
+@author 周昊天
+
+'''
+#生成新的重件点代价矩阵（在之前的操作中重件点表更新了）
 def Generate_HPnewCostmatrix(hp):
     Node_num = np.shape(hp)[0]
     HP_costmatrix = np.zeros((Node_num, Node_num))
@@ -30,7 +36,7 @@ def Generate_HPnewCostmatrix(hp):
 
     return HP_costmatrix
 
-
+#计算物流车的行驶路径长度之和
 def cal_UGVcost():
 
 	def Find_inRoutes(routes, hp_index):
@@ -88,6 +94,7 @@ def cal_UGVcost():
 	print "UGV :" , UGVcost_sum
 	return UGVcost_sum
 
+#计算无人机的行驶路径长度之和
 def cal_UAVcost() :
 	def cal_UAVcost_normal(class_num,route,Depot1,Depot2):  # 计算传入路径的总代价
 		# 没有加入重量限制
@@ -177,7 +184,7 @@ def cal_UAVcost() :
 	return UAVcost_sum
 
 
-
+#计算总时间代价
 def cal_Timecost(v1,v2):
 	Timecost = 0
 	UGV_timecost = UGVcost/v1
@@ -193,6 +200,8 @@ def cal_Timecost(v1,v2):
 	print "Timecost:" , Timecost
 	return Timecost
 
+
+#数据载入
 HP_data = np.array(pd.read_excel("Data/HP_raw.xlsx"))
 
 HP_newdata = np.array(pd.read_excel("Data/HP_new.xlsx"))
@@ -210,6 +219,8 @@ classnum = np.shape(Class_type)[0]
 UAV_maxlist = np.zeros(classnum)
 UGV_routelen = np.zeros(classnum)
 
+
+#Begin
 UGVcost = cal_UGVcost()
 UAVcost = cal_UAVcost()
 

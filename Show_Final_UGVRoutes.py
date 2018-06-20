@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import csv
 
+"""
+显示物流车路径
+"""
 def show_route():
     with open("Data/New_routes.csv", "r") as csvfile:
         reader = csv.reader(csvfile)

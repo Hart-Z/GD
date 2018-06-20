@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 '''
+类内无人机禁忌搜索CVRP算法
 UAV TS-CVRP Solver
 Input:
     class_l
